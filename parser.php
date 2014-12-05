@@ -13,16 +13,6 @@ class PathParser {
 	private $_regExExcludeList = array();
 
 	/**
-	 * __get
-	 * @param $name
-	 * @return mixed
-	 */
-	public function __get($orig) {
-		$name = "_" . $orig;
-		return $this->$name;
-	}
-
-	/**
 	 * __construct
 	 * @param $name
 	 * @return mixed
@@ -34,40 +24,6 @@ class PathParser {
 		}
 	}
 
-	/**
-	 * loadRules
-	 * @param $ruleText
-	 * @return bool
-	 */
-	public function loadRules($ruleText) {
-		$array = explode("\n", $ruleText);
-		if ($this->debug) { var_dump($array); }
-		for ($i = 0; $i < count($array); $i++) {
-			//echo $array[$i][0] . "\n";
-			switch ($array[$i][0]) {
-				case "#":
-					// Ignore
-					break;
-				case ":":
-					// RegExp
-					$this->buildRegExpList($array[$i], $this->_regExList);
-					break;
-				case '!':
-					if ($array[$i][1] == ':') {
-						$this->buildRegExpList($array[$i], $this->_regExExcludeList);
-					} else {
-						$this->buildTree(0, explode("/", substr($array[$i], 1)), $this->_ruleExcludeTree);
-					}
-					break;
-				default:
-					$this->buildTree(0, explode("/", $array[$i]), $this->_ruleTree);
-					
-					break;
-			}
-		}
-		if ($this->debug) {var_dump($this->_ruleTree);}
-		
-	}
 
 	/**
 	 * buildTree
@@ -151,19 +107,53 @@ class PathParser {
 
 	}
 
-
-
 	/**
 	 * checkRegExp
 	 * @param $path
 	 * @return bool
 	 */
-	public function _checkRegExp($path, $array) {
+	private function _checkRegExp($path, $array) {
 		foreach ($array as $key => $value) {
 			if ($this->debug) { echo "Check RegExp: " . $value . " , Result: " . (preg_match($value, $path) ? "True" : "False") . "\n";}  
 			if (preg_match($value, $path)) return true;
 		}
 		return false;
+	}
+
+
+	/**
+	 * loadRules
+	 * @param $ruleText
+	 * @return bool
+	 */
+	public function loadRules($ruleText) {
+		$array = explode("\n", $ruleText);
+		if ($this->debug) { var_dump($array); }
+		for ($i = 0; $i < count($array); $i++) {
+			//echo $array[$i][0] . "\n";
+			switch ($array[$i][0]) {
+				case "#":
+					// Ignore
+					break;
+				case ":":
+					// RegExp
+					$this->buildRegExpList($array[$i], $this->_regExList);
+					break;
+				case '!':
+					if ($array[$i][1] == ':') {
+						$this->buildRegExpList($array[$i], $this->_regExExcludeList);
+					} else {
+						$this->buildTree(0, explode("/", substr($array[$i], 1)), $this->_ruleExcludeTree);
+					}
+					break;
+				default:
+					$this->buildTree(0, explode("/", $array[$i]), $this->_ruleTree);
+					
+					break;
+			}
+		}
+		if ($this->debug) {var_dump($this->_ruleTree);}
+		
 	}
 
 
