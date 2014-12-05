@@ -1,5 +1,5 @@
 #Test
 /zb_users/cache/*
 !/zb_users/cache/1.html
-:RI|/zb_users/.+
-!:RI|/zb_users/.+\.jpg
+:i|\/zb_users\/.+
+!:i|\/zb_users\/.+\.jpg
