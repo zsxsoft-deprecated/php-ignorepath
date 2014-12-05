@@ -11,8 +11,6 @@ class PathParser {
 	private $_ruleExcludeTree = array();
 	private $_regExList = array();
 	private $_regExExcludeList = array();
-	private $_ignoreCase = false;
-
 
 	/**
 	 * __get
@@ -131,6 +129,9 @@ class PathParser {
 			$str = "/" . $str . "/";
 
 			//var_dump($str);var_dump($val);echo "\n". (preg_match($str, $val) ? "a" : "b");
+			if ($this->debug) {
+				echo "deep = " . $deep . ", RegEx = " . $str . ", Value = ". $val . ", Result = " . (preg_match($str, $val) ? "True" : "False") . "\n";
+			}
 			if (preg_match($str, $val)) {
 				if ($deep == count($array) - 1 || count($child) == 0) {
 					return true;
@@ -153,7 +154,7 @@ class PathParser {
 	 */
 	public function _checkRegExp($path, $array) {
 		foreach ($array as $key => $value) {
-			echo $value . "\n";  
+			if ($this->debug) { echo "Check RegExp: " . $value . " , Result: " . (preg_match($value, $path) ? "True" : "False") . "\n";}  
 			if (preg_match($value, $path)) return true;
 		}
 		return false;
