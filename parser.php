@@ -8,7 +8,9 @@ class PathParser {
 	public $debug = true;
 	private $_base = '';
 	private $_ruleTree = array();
+	private $_ruleExcludeTree = array();
 	private $_regExList = array();
+	private $_regExExcludeList = array();
 	private $_ignoreCase = false;
 
 
@@ -43,6 +45,7 @@ class PathParser {
 		$array = explode("\n", $ruleText);
 		if ($this->debug) { var_dump($array); }
 		for ($i = 0; $i < count($array); $i++) {
+			echo $array[$i][0] . "\n";
 			switch ($array[$i][0]) {
 				case "#":
 					// Ignore
@@ -50,6 +53,13 @@ class PathParser {
 				case ":":
 					// RegExp
 					array_push($this->_regExList, substr($array[$i], strpos($array[$i], "|") + 1));
+					break;
+				case '!':
+					if ($array[$i][1] == ':') {
+						array_push($this->_regExList, substr(substr($array[$i], strpos($array[$i], "|") + 1), 1));
+					} else {
+						$this->buildTree(0, explode("/", substr($array[$i], 1)), $this->_ruleExcludeTree);
+					}
 					break;
 				default:
 					$this->buildTree(0, explode("/", $array[$i]), $this->_ruleTree);
@@ -65,6 +75,7 @@ class PathParser {
 	 * buildTree
 	 * @param $deep
 	 * @param $array
+	 * @param $tree
 	 * @return bool
 	 */
 	public function buildTree($deep, $array, &$tree) {
@@ -132,13 +143,23 @@ class PathParser {
 	 * @return bool
 	 */
 	public function checkPath($path) {
+		
+		// False means exclude
+		// True means include
+
 		$array = explode("/", $path);
-		if (!$this->_checkRegExp($path)) {
-			return $this->_analyze(0, $array, $this->_ruleTree);
+
+		// Check exclude by RegExp first
+		if ($this->_checkRegExp($path, $this->_regExExcludeList)) return false;
+		// Check include by RegExp first
+		if ($this->_checkRegExp($path, $this->_regExList)) return true;
+		if ($this->_analyze(0, $array, $this->_ruleTree)) {
+			// If found then check exclude
+			return !$this->_analyze(0, $array, $this->_ruleExcludeTree);
+		} else {
+			return false;
 		}
-		else {
-			return true;
-		}
+
 		
 	}
 
