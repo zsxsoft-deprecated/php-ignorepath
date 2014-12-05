@@ -2,7 +2,7 @@
 /just/testing/dir1/*.html
 !/just/testing/dir1/*.php
 /just/testing/dir2/
-!\/just\/testing\/dir2\/exclude.html
+!/just/testing/dir2/exclude.html
 :i|\/just\/testing\/dir1\/\w+.jpg
 !:i|\/just\/testing\/dir1\/\d+.jpg
-:i|\/just\/testing\/dir\\D+
+:i|\/just\/testing\/dir\D+

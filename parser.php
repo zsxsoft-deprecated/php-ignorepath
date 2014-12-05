@@ -5,7 +5,7 @@
  */
 class PathParser {
 
-	public $debug = true;
+	public $debug = false;
 	private $_base = '';
 	private $_ruleTree = array();
 	private $_ruleExcludeTree = array();
@@ -65,7 +65,7 @@ class PathParser {
 					break;
 			}
 		}
-		var_dump($this->_ruleTree);
+		if ($this->debug) {var_dump($this->_ruleTree);}
 		
 	}
 
@@ -136,12 +136,18 @@ class PathParser {
 				if ($deep == count($array) - 1 || count($child) == 0) {
 					return true;
 				}
-				return $this->_analyze($deep + 1, $array, $child);
+				if ($this->_analyze($deep + 1, $array, $child)) {
+					return true;
+				} else {
+					continue;
+				}
 			}
 			else {
-				return false;
+				continue;
 			}
 		}
+
+		return false;
 
 	}
 
@@ -174,11 +180,15 @@ class PathParser {
 		$array = explode("/", $path);
 
 		// Check exclude by RegExp first
+		if ($this->debug) { echo "Check Exclude RegExp: \n";}
 		if ($this->_checkRegExp($path, $this->_regExExcludeList)) return false;
-		// Check include by RegExp first
+		// Check include by RegExp second
+		if ($this->debug) { echo "Check Include RegExp: \n";}
 		if ($this->_checkRegExp($path, $this->_regExList)) return true;
+		if ($this->debug) { echo "Check Include: \n";}
 		if ($this->_analyze(0, $array, $this->_ruleTree)) {
 			// If found then check exclude
+			if ($this->debug) { echo "Check Exclude: \n";}
 			return !$this->_analyze(0, $array, $this->_ruleExcludeTree);
 		} else {
 			return false;
