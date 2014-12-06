@@ -1,7 +1,7 @@
 <?php
 ini_set('display_error', 1); error_reporting(E_ALL);
-require('parser.php');
-$parser = new PathParser('', './test.txt');
+require('ignorepath.php');
+$parser = new IgnorePath('', './test.txt');
 
 $start = microtime(true);
 $array = array(

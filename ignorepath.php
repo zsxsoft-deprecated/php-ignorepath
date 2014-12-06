@@ -3,7 +3,7 @@
  * PHP Path Parser
  * @package phppathparser
  */
-class PathParser {
+class IgnorePath {
 
 	public $debug = false;
 	private $_base = '';
